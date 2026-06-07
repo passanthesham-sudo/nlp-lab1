@@ -4,9 +4,8 @@ data/raw/*.zip
 data/raw/*.gz
 data/raw/*.txt
 
-# Trained model artefacts (tracked via DVC)
-models/
-/models
+# Trained model artefacts (tracked via DVC) — root-level models/ only
+/models/
 
 # MLflow run data
 mlruns/
