@@ -1,0 +1,4 @@
+# Add patterns of files dvc should ignore.
+**/.git
+**/.DS_Store
+**/Thumbs.db

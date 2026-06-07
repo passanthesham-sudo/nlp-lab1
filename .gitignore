@@ -1,0 +1,29 @@
+# Large data files (tracked via DVC, not git)
+data/raw/*.csv
+data/raw/*.zip
+data/raw/*.gz
+data/raw/*.txt
+
+# Trained model artefacts (tracked via DVC)
+models/
+/models
+
+# MLflow run data
+mlruns/
+mlartifacts/
+
+# Embedding plots and models
+outputs/
+metrics/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Do NOT ignore: *.dvc files, .dvc/ dir (DVC metadata — must be committed)

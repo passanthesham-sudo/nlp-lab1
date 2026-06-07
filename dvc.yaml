@@ -1,0 +1,86 @@
+stages:
+
+  # -----------------------------------------------------------------------
+  # Train Amazon sentiment model + build BM25 search index
+  # -----------------------------------------------------------------------
+  train_amazon:
+    cmd: >-
+      python experiments/train.py
+      --amazon-path data/raw/Reviews.csv
+      --skip-sentiment140
+    deps:
+      - experiments/train.py
+      - src/preprocessing/pipeline.py
+      - src/vectorization/tfidf.py
+      - src/vectorization/bow.py
+      - src/models/sentiment.py
+      - src/search/engine.py
+      - data/raw/Reviews.csv
+    params:
+      - params.yaml:
+          - preprocessing
+          - training.amazon
+          - search.bm25
+    outs:
+      - models/sentiment_amazon.pkl
+      - models/search_engine.pkl
+    metrics:
+      - metrics/amazon_metrics.json:
+          cache: false
+
+  # -----------------------------------------------------------------------
+  # Train Sentiment140 model
+  # -----------------------------------------------------------------------
+  train_sentiment140:
+    cmd: >-
+      python experiments/train.py
+      --sentiment140-path data/raw/training.1600000.processed.noemoticon.csv
+      --amazon-path data/raw/Reviews.csv
+    deps:
+      - experiments/train.py
+      - src/preprocessing/pipeline.py
+      - src/vectorization/tfidf.py
+      - src/vectorization/bow.py
+      - src/models/sentiment.py
+      - data/raw/training.1600000.processed.noemoticon.csv
+    params:
+      - params.yaml:
+          - preprocessing
+          - training.sentiment140
+    outs:
+      - models/sentiment_sentiment140.pkl
+    metrics:
+      - metrics/sentiment140_metrics.json:
+          cache: false
+
+  # -----------------------------------------------------------------------
+  # Vectorizer comparison experiment
+  # -----------------------------------------------------------------------
+  compare_vectorizers:
+    cmd: python experiments/compare_vectorizers.py --sample 10000
+    deps:
+      - experiments/compare_vectorizers.py
+      - src/models/sentiment.py
+      - src/vectorization/bm25.py
+      - data/raw/Reviews.csv
+    params:
+      - params.yaml:
+          - preprocessing
+
+  # -----------------------------------------------------------------------
+  # Word embeddings visualization
+  # -----------------------------------------------------------------------
+  visualize_embeddings:
+    cmd: python experiments/visualize_embeddings.py --sample 20000
+    deps:
+      - experiments/visualize_embeddings.py
+      - src/vectorization/embeddings.py
+      - data/raw/Reviews.csv
+    params:
+      - params.yaml:
+          - embeddings
+    outs:
+      - outputs/embeddings/amazon_tsne.png
+      - outputs/embeddings/amazon_pca.png
+      - outputs/embeddings/food_vs_sentiment_pca.png
+      - outputs/embeddings/word2vec_amazon.model

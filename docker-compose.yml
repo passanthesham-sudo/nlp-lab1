@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+
+  # -------------------------------------------------------------------------
+  # FastAPI — sentiment classifier + BM25 search
+  # -------------------------------------------------------------------------
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models        # pre-trained model artefacts
+      - ./data:/app/data            # dataset files
+    environment:
+      MODEL_PATH: models/sentiment_amazon.pkl
+      SEARCH_ENGINE_PATH: models/search_engine.pkl
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    depends_on:
+      - mlflow
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------------
+  # MLflow tracking server
+  # -------------------------------------------------------------------------
+  mlflow:
+    image: python:3.11-slim
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+      - ./mlartifacts:/mlflow/mlartifacts
+    command: >
+      bash -c "pip install mlflow --quiet &&
+               mlflow server
+               --host 0.0.0.0
+               --port 5000
+               --backend-store-uri /mlflow/mlruns
+               --default-artifact-root /mlflow/mlartifacts"
+    restart: unless-stopped
