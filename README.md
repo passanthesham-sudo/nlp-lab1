@@ -1,4 +1,4 @@
-# NLP Intelligence System — Lab 1
+# NLP Intelligence System 
 
 Sentiment classifier + BM25 search engine over **Amazon Fine Food Reviews** and **Sentiment140**, tracked with MLflow, versioned with DVC, and deployed as a Dockerized FastAPI service.
 
